@@ -1,8 +1,9 @@
 use std::fmt;
-
 use rand::{self, Rng};
 
-#[derive(Debug, PartialEq)]
+mod main_test;
+
+#[derive(Debug, PartialEq, Copy, Clone)]
 enum RouletteSpin {
     DoubleZero,
     Zero,
@@ -20,6 +21,7 @@ struct Bet {
     bet_type: BetType,
 }
 
+#[allow(dead_code)]
 #[derive(Debug, PartialEq)]
 enum BetType {
     Single(i32),
@@ -43,12 +45,7 @@ enum BetType {
 
 impl Bet {
     fn pays(&self, spin: RouletteSpin) -> i32 {
-    //     return match spin {
-    //         RouletteSpin::Number(n) => self.amount * 35,
-    //         RouletteSpin::Street(n) => self.amount * 11,
-    //         _ => 0,
-    //     };
-    // }
+        // dbg!(self, spin);
         match self.bet_type {
             BetType::Single(n) => {
                 if spin == RouletteSpin::Number(n) {
@@ -56,16 +53,49 @@ impl Bet {
                 } else {
                     0
                 }
-            },
-            BetType::Street(n) => {
-                if spin == RouletteSpin::Number(n) {
-                    11 * self.amount
-                } else {
-                    0
+            }
+            BetType::Street(street) => {
+                assert!(
+                    street >= 0 && street <= 11,
+                    "Street must be between 0 and 11"
+                );
+                match spin {
+                    RouletteSpin::Number(n) => {
+                        // dbg!(n, street * 3 + 1, street * 3 + 3);
+                        if n >= street * 3 + 1 && n <= street * 3 + 3 {
+                            11 * self.amount
+                        } else {
+                            0
+                        }
+                    }
+                    _ => 0,
                 }
+            }
+            BetType::Red => match spin {
+                RouletteSpin::Number(n) => {
+                    if RouletteSpin::color(&n) == "Red" {
+                        self.amount
+                    } else {
+                        0
+                    }
+                }
+                _ => 0,
+            },
+            BetType::Black => match spin {
+                RouletteSpin::Number(n) => {
+                    if RouletteSpin::color(&n) == "Black" {
+                        self.amount
+                    } else {
+                        0
+                    }
+                }
+                _ => 0,
             },
 
-            _ => 0,
+            _ => {
+                print!("Not implemented");
+                0
+            }
         }
     }
 }
@@ -136,59 +166,4 @@ impl fmt::Display for RouletteSpin {
 
 fn main() {
     println!("Hello, world: {}", RouletteSpin::spin());
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_spin_to_string() {
-        let spin = RouletteSpin::Number(1);
-        assert_eq!(spin.to_string(), "Red 1");
-
-        let spin = RouletteSpin::Number(2);
-        assert_eq!(spin.to_string(), "Black 2");
-
-        let spin = RouletteSpin::DoubleZero;
-        assert_eq!(spin.to_string(), "00");
-
-        let spin = RouletteSpin::Zero;
-        assert_eq!(spin.to_string(), "0");
-    }
-
-    #[test]
-    fn bet() {
-        let bet = Bet {
-            amount: 1,
-            bet_type: BetType::Single(1),
-        };
-        assert_eq!(bet.amount, 1);
-        assert_eq!(bet.bet_type, BetType::Single(1));
-    }
-
-    #[test]
-    fn single_bet_pays() {
-        let bet = Bet {
-            amount: 1,
-            bet_type: BetType::Single(35),
-        };
-        let spin = RouletteSpin::Number(35);
-
-        assert_eq!(bet.pays(spin), 35 * bet.amount);
-    }
-
-    #[test]
-    fn street_bet_pays() {
-        let bet = Bet {
-            amount: 1,
-            bet_type: BetType::Street(7),
-        };
-
-        let spin = RouletteSpin::Number(10);
-        assert_eq!(bet.pays(spin), 0);
-
-        let spin = RouletteSpin::Number(7);
-        assert_eq!(bet.pays(spin), 11 * bet.amount);
-    }
 }
