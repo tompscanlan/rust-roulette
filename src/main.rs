@@ -1,5 +1,5 @@
-use std::fmt;
 use rand::{self, Rng};
+use std::fmt;
 
 mod main_test;
 
@@ -44,6 +44,7 @@ enum BetType {
 }
 
 impl Bet {
+    #[allow(dead_code)]
     fn pays(&self, spin: RouletteSpin) -> i32 {
         // dbg!(self, spin);
         match self.bet_type {
@@ -56,13 +57,13 @@ impl Bet {
             }
             BetType::Street(street) => {
                 assert!(
-                    street >= 0 && street <= 11,
+                    (0..=11).contains(&street),
                     "Street must be between 0 and 11"
                 );
                 match spin {
                     RouletteSpin::Number(n) => {
                         // dbg!(n, street * 3 + 1, street * 3 + 3);
-                        if n >= street * 3 + 1 && n <= street * 3 + 3 {
+                        if n > street * 3 && n <= street * 3 + 3 {
                             11 * self.amount
                         } else {
                             0
@@ -113,7 +114,7 @@ impl RouletteSpin {
     }
 
     fn color(n: &i32) -> String {
-        return match n {
+        match n {
             1 => "Red".to_string(),
             2 => "Black".to_string(),
             3 => "Red".to_string(),
@@ -151,7 +152,7 @@ impl RouletteSpin {
             35 => "Black".to_string(),
             36 => "Red".to_string(),
             _ => "Green".to_string(),
-        };
+        }
     }
 }
 impl fmt::Display for RouletteSpin {
