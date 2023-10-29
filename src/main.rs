@@ -2,6 +2,13 @@ use rand::{self, Rng};
 use std::fmt;
 
 mod main_test;
+#[derive(Debug, PartialEq)]
+struct RouletteSession {
+    bets: Vec<Bet>,
+    spins: Vec<RouletteSpin>,
+    start_amount: i32,
+    amount: i32,
+}
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 enum RouletteSpin {
@@ -75,7 +82,7 @@ impl Bet {
             BetType::Red => match spin {
                 RouletteSpin::Number(n) => {
                     if RouletteSpin::color(&n) == "Red" {
-                        self.amount
+                        self.amount + self.amount
                     } else {
                         0
                     }
@@ -166,5 +173,42 @@ impl fmt::Display for RouletteSpin {
 }
 
 fn main() {
-    println!("Hello, world: {}", RouletteSpin::spin());
+    let mut session: RouletteSession = RouletteSession {
+        bets: vec![
+            Bet {
+                amount: 1,
+                bet_type: BetType::Red,
+            },
+            Bet {
+                amount: 1,
+                bet_type: BetType::Red,
+            },
+        ],
+        spins: vec![],
+        start_amount: 100,
+        amount: 100,
+    };
+
+    for _ in 0..100 {
+        println!("Bets: {:?}", session.bets);
+        println!("Amount: {}", session.amount);
+        let spin = RouletteSpin::spin();
+        session.spins.push(spin);
+        println!("Spin: {}", spin);
+
+        let bet = session.bets.pop().unwrap();
+        session.amount -= bet.amount;
+
+        session.amount += bet.pays(spin);
+
+        if session.amount <= 0 {
+            println!("You lost it all!");
+            break;
+        }
+
+        if session.amount >= session.start_amount * 2 {
+            println!("You doubled your money!");
+            break;
+        }
+    }
 }
