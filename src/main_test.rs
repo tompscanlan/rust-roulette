@@ -79,13 +79,13 @@ fn red_bet_pays() {
 
     for bet in bets {
         let spin = RouletteSpin::Number(34);
-        assert_eq!(bet.pays(&spin), bet.amount);
+        assert_eq!(bet.pays(&spin), bet.amount + bet.amount);
 
         let spin = RouletteSpin::Number(18);
-        assert_eq!(bet.pays(&spin), bet.amount);
+        assert_eq!(bet.pays(&spin), bet.amount + bet.amount);
 
         let spin = RouletteSpin::Number(5);
-        assert_eq!(bet.pays(&spin), bet.amount);
+        assert_eq!(bet.pays(&spin), bet.amount + bet.amount);
 
         let spin = RouletteSpin::DoubleZero;
         assert_eq!(bet.pays(&spin), 0);

@@ -1,15 +1,12 @@
-use rand::{self};
-
-
 mod bet;
 mod main_test;
 mod strategy;
 
+mod spin;
 use bet::{Bet, BetType};
+use spin::RouletteSpin;
 use strategy::doubleonloss::DoubleOnLoss;
 use strategy::Strategy;
-mod spin;
-use spin::RouletteSpin;
 
 struct RouletteSession<'a> {
     bets: Vec<Bet>,
@@ -17,11 +14,6 @@ struct RouletteSession<'a> {
     strategy: Box<dyn Strategy + 'a>,
     start_amount: i32,
     amount: i32,
-}
-
-#[derive(Debug, PartialEq)]
-struct Bets {
-    bets: Vec<Bet>,
 }
 
 fn main() {
