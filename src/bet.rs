@@ -60,7 +60,7 @@ impl Bet {
             }
             BetType::Red => match spin {
                 RouletteSpin::Number(n) => {
-                    if RouletteSpin::color(&n) == "Red" {
+                    if RouletteSpin::color(n) == "Red" {
                         self.amount + self.amount
                     } else {
                         0
@@ -70,7 +70,7 @@ impl Bet {
             },
             BetType::Black => match spin {
                 RouletteSpin::Number(n) => {
-                    if RouletteSpin::color(&n) == "Black" {
+                    if RouletteSpin::color(n) == "Black" {
                         self.amount
                     } else {
                         0

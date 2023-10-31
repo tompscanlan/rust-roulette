@@ -9,7 +9,7 @@ pub struct DoubleOnLoss {
 
 impl Strategy for DoubleOnLoss {
     fn next_bet(&mut self, spins: Vec<RouletteSpin>, bets: Vec<Bet>) -> Bet {
-        if bets.len() == 0 || spins.len() == 0 {
+        if bets.is_empty() || spins.is_empty() {
             return Bet {
                 amount: 5,
                 bet_type: BetType::Black,

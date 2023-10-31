@@ -45,23 +45,23 @@ fn street_bet_pays() {
     };
 
     let spin = RouletteSpin::Number(10);
-    assert_eq!(bet.pays(spin), 0);
+    assert_eq!(bet.pays(&spin), 0);
 
     let spin = RouletteSpin::Number(7);
-    assert_eq!(bet.pays(spin), 11 * bet.amount);
+    assert_eq!(bet.pays(&spin), 11 * bet.amount);
 
     let spin = RouletteSpin::Number(4);
-    assert_eq!(bet.pays(spin), 0);
+    assert_eq!(bet.pays(&spin), 0);
 
     let bet = Bet {
         amount: 1,
         bet_type: BetType::Street(11),
     };
     let spin = RouletteSpin::Number(34);
-    assert_eq!(bet.pays(spin), 11 * bet.amount);
+    assert_eq!(bet.pays(&spin), 11 * bet.amount);
 
     let spin = RouletteSpin::Number(33);
-    assert_eq!(bet.pays(spin), 0);
+    assert_eq!(bet.pays(&spin), 0);
 }
 
 #[test]
@@ -79,22 +79,22 @@ fn red_bet_pays() {
 
     for bet in bets {
         let spin = RouletteSpin::Number(34);
-        assert_eq!(bet.pays(spin), bet.amount);
+        assert_eq!(bet.pays(&spin), bet.amount);
 
         let spin = RouletteSpin::Number(18);
-        assert_eq!(bet.pays(spin), bet.amount);
+        assert_eq!(bet.pays(&spin), bet.amount);
 
         let spin = RouletteSpin::Number(5);
-        assert_eq!(bet.pays(spin), bet.amount);
+        assert_eq!(bet.pays(&spin), bet.amount);
 
         let spin = RouletteSpin::DoubleZero;
-        assert_eq!(bet.pays(spin), 0);
+        assert_eq!(bet.pays(&spin), 0);
 
         let spin = RouletteSpin::Zero;
-        assert_eq!(bet.pays(spin), 0);
+        assert_eq!(bet.pays(&spin), 0);
 
         let spin = RouletteSpin::Number(2);
-        assert_eq!(bet.pays(spin), 0);
+        assert_eq!(bet.pays(&spin), 0);
     }
 }
 
@@ -113,22 +113,22 @@ fn black_bet_pays() {
 
     for bet in bets {
         let spin = RouletteSpin::Number(34);
-        assert_eq!(bet.pays(spin), 0);
+        assert_eq!(bet.pays(&spin), 0);
 
         let spin = RouletteSpin::Number(18);
-        assert_eq!(bet.pays(spin), 0);
+        assert_eq!(bet.pays(&spin), 0);
 
         let spin = RouletteSpin::Number(5);
-        assert_eq!(bet.pays(spin), 0);
+        assert_eq!(bet.pays(&spin), 0);
 
         let spin = RouletteSpin::DoubleZero;
-        assert_eq!(bet.pays(spin), 0);
+        assert_eq!(bet.pays(&spin), 0);
 
         let spin = RouletteSpin::Zero;
-        assert_eq!(bet.pays(spin), 0);
+        assert_eq!(bet.pays(&spin), 0);
 
         let spin = RouletteSpin::Number(2);
-        assert_eq!(bet.pays(spin), bet.amount);
+        assert_eq!(bet.pays(&spin), bet.amount);
     }
 }
 
@@ -154,6 +154,6 @@ fn test_a_round() {
     dbg!(spin);
 
     for bet in bets {
-        dbg!(bet.pays(spin));
+        dbg!(bet.pays(&spin));
     }
 }
