@@ -2,12 +2,42 @@ use rand::{self, Rng};
 use std::fmt;
 
 mod main_test;
-#[derive(Debug, PartialEq)]
-struct RouletteSession {
+struct RouletteSession<'a> {
     bets: Vec<Bet>,
     spins: Vec<RouletteSpin>,
+    strategy: Box<dyn Strategy + 'a>,
     start_amount: i32,
     amount: i32,
+}
+
+trait Strategy {
+    fn next_bet(&mut self, spins: Vec<RouletteSpin>, bets: Vec<Bet>) -> Bet;
+}
+#[derive(Debug, PartialEq, Copy, Clone)]
+struct MyStrategy {
+    // Define the state of the strategy here
+}
+
+impl Strategy for MyStrategy {
+    fn next_bet(&mut self, spins: Vec<RouletteSpin>, bets: Vec<Bet>) -> Bet {
+        if bets.len() == 0 || spins.len() == 0 {
+            return Bet {
+                amount: 5,
+                bet_type: BetType::Black,
+            };
+        }
+        if bets.last().unwrap().pays(spins.last().unwrap()) == 0 {
+            Bet {
+                amount: bets.last().unwrap().amount * 2,
+                bet_type: BetType::Single(5),
+            }
+        } else {
+            Bet {
+                amount: 5,
+                bet_type: BetType::Single(5),
+            }
+        }
+    }
 }
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -22,14 +52,14 @@ struct Bets {
     bets: Vec<Bet>,
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 struct Bet {
     amount: i32,
     bet_type: BetType,
 }
 
 #[allow(dead_code)]
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Copy, Clone)]
 enum BetType {
     Single(i32),
     Split(i32, i32),
@@ -52,11 +82,11 @@ enum BetType {
 
 impl Bet {
     #[allow(dead_code)]
-    fn pays(&self, spin: RouletteSpin) -> i32 {
+    fn pays(&self, spin: &RouletteSpin) -> i32 {
         // dbg!(self, spin);
         match self.bet_type {
             BetType::Single(n) => {
-                if spin == RouletteSpin::Number(n) {
+                if *spin == RouletteSpin::Number(n) {
                     35 * self.amount
                 } else {
                     0
@@ -70,7 +100,7 @@ impl Bet {
                 match spin {
                     RouletteSpin::Number(n) => {
                         // dbg!(n, street * 3 + 1, street * 3 + 3);
-                        if n > street * 3 && n <= street * 3 + 3 {
+                        if n > &(street * 3) && n <= &(street * 3 + 3) {
                             11 * self.amount
                         } else {
                             0
@@ -173,42 +203,39 @@ impl fmt::Display for RouletteSpin {
 }
 
 fn main() {
-    let mut session: RouletteSession = RouletteSession {
-        bets: vec![
-            Bet {
-                amount: 1,
-                bet_type: BetType::Red,
-            },
-            Bet {
-                amount: 1,
-                bet_type: BetType::Red,
-            },
-        ],
+    let mut session = RouletteSession {
+        bets: vec![],
         spins: vec![],
         start_amount: 100,
         amount: 100,
+        strategy: Box::new(MyStrategy {}),
     };
 
-    for _ in 0..100 {
-        println!("Bets: {:?}", session.bets);
-        println!("Amount: {}", session.amount);
-        let spin = RouletteSpin::spin();
-        session.spins.push(spin);
-        println!("Spin: {}", spin);
+    for _ in 0..100000 {
+        println!("Cash: {}", session.amount);
+        let s = &mut session.strategy;
 
-        let bet = session.bets.pop().unwrap();
+        let bet = s.next_bet(session.spins.clone(), session.bets.clone());
+        println!("Placing bet: {:?}", bet);
+        session.bets.push(bet);
         session.amount -= bet.amount;
 
-        session.amount += bet.pays(spin);
+        let spin = RouletteSpin::spin();
+        session.spins.push(spin);
+        println!("Spin turned up {}", spin);
+
+        let pay_out = bet.pays(&spin);
+        session.amount += pay_out;
+        println!("Pay out: {}", pay_out);
 
         if session.amount <= 0 {
             println!("You lost it all!");
+            print!("Spins: {:?}", session.spins.len());
             break;
         }
 
-        if session.amount >= session.start_amount * 2 {
-            println!("You doubled your money!");
-            break;
-        }
+        // if session.amount >= session.start_amount * 2 {
+        //     println!("You doubled your money!");
+        // }
     }
 }
