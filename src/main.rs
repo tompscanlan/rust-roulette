@@ -1,7 +1,14 @@
 use rand::{self, Rng};
 use std::fmt;
 
+mod bet;
 mod main_test;
+mod strategy;
+
+use bet::{Bet, BetType};
+use strategy::doubleonloss::DoubleOnLoss;
+use strategy::Strategy;
+
 struct RouletteSession<'a> {
     bets: Vec<Bet>,
     spins: Vec<RouletteSpin>,
@@ -10,38 +17,8 @@ struct RouletteSession<'a> {
     amount: i32,
 }
 
-trait Strategy {
-    fn next_bet(&mut self, spins: Vec<RouletteSpin>, bets: Vec<Bet>) -> Bet;
-}
 #[derive(Debug, PartialEq, Copy, Clone)]
-struct MyStrategy {
-    // Define the state of the strategy here
-}
-
-impl Strategy for MyStrategy {
-    fn next_bet(&mut self, spins: Vec<RouletteSpin>, bets: Vec<Bet>) -> Bet {
-        if bets.len() == 0 || spins.len() == 0 {
-            return Bet {
-                amount: 5,
-                bet_type: BetType::Black,
-            };
-        }
-        if bets.last().unwrap().pays(spins.last().unwrap()) == 0 {
-            Bet {
-                amount: bets.last().unwrap().amount * 2,
-                bet_type: BetType::Single(5),
-            }
-        } else {
-            Bet {
-                amount: 5,
-                bet_type: BetType::Single(5),
-            }
-        }
-    }
-}
-
-#[derive(Debug, PartialEq, Copy, Clone)]
-enum RouletteSpin {
+pub enum RouletteSpin {
     DoubleZero,
     Zero,
     Number(i32),
@@ -50,92 +27,6 @@ enum RouletteSpin {
 #[derive(Debug, PartialEq)]
 struct Bets {
     bets: Vec<Bet>,
-}
-
-#[derive(Debug, PartialEq, Copy, Clone)]
-struct Bet {
-    amount: i32,
-    bet_type: BetType,
-}
-
-#[allow(dead_code)]
-#[derive(Debug, PartialEq, Copy, Clone)]
-enum BetType {
-    Single(i32),
-    Split(i32, i32),
-    Street(i32),
-    DoubleStreet,
-    Basket,
-    FirstFour,
-    TopLine,
-    Corner,
-    Low,
-    High,
-    Red,
-    Black,
-    Even,
-    Odd,
-    Dozen,
-    Column,
-    Snake,
-}
-
-impl Bet {
-    #[allow(dead_code)]
-    fn pays(&self, spin: &RouletteSpin) -> i32 {
-        // dbg!(self, spin);
-        match self.bet_type {
-            BetType::Single(n) => {
-                if *spin == RouletteSpin::Number(n) {
-                    35 * self.amount
-                } else {
-                    0
-                }
-            }
-            BetType::Street(street) => {
-                assert!(
-                    (0..=11).contains(&street),
-                    "Street must be between 0 and 11"
-                );
-                match spin {
-                    RouletteSpin::Number(n) => {
-                        // dbg!(n, street * 3 + 1, street * 3 + 3);
-                        if n > &(street * 3) && n <= &(street * 3 + 3) {
-                            11 * self.amount
-                        } else {
-                            0
-                        }
-                    }
-                    _ => 0,
-                }
-            }
-            BetType::Red => match spin {
-                RouletteSpin::Number(n) => {
-                    if RouletteSpin::color(&n) == "Red" {
-                        self.amount + self.amount
-                    } else {
-                        0
-                    }
-                }
-                _ => 0,
-            },
-            BetType::Black => match spin {
-                RouletteSpin::Number(n) => {
-                    if RouletteSpin::color(&n) == "Black" {
-                        self.amount
-                    } else {
-                        0
-                    }
-                }
-                _ => 0,
-            },
-
-            _ => {
-                print!("Not implemented");
-                0
-            }
-        }
-    }
 }
 
 impl RouletteSpin {
@@ -208,7 +99,7 @@ fn main() {
         spins: vec![],
         start_amount: 100,
         amount: 100,
-        strategy: Box::new(MyStrategy {}),
+        strategy: Box::new(DoubleOnLoss {}),
     };
 
     for _ in 0..100000 {

@@ -34,7 +34,7 @@ fn single_bet_pays() {
     };
     let spin = RouletteSpin::Number(35);
 
-    assert_eq!(bet.pays(spin), 35 * bet.amount);
+    assert_eq!(bet.pays(&spin), 35 * bet.amount);
 }
 
 #[test]
