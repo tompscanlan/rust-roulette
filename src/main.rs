@@ -1,5 +1,5 @@
-use rand::{self, Rng};
-use std::fmt;
+use rand::{self};
+
 
 mod bet;
 mod main_test;
