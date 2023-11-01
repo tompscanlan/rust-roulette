@@ -9,7 +9,7 @@ use strategy::doubleonloss::DoubleOnLoss;
 use strategy::Strategy;
 
 struct RouletteSession<'a> {
-    bets: Vec<Bet>,
+    bets: Vec<Vec<Bet>>,
     spins: Vec<RouletteSpin>,
     strategy: Box<dyn Strategy + 'a>,
     start_amount: i32,
@@ -29,18 +29,23 @@ fn main() {
         println!("Cash: {}", session.amount);
         let s = &mut session.strategy;
 
-        let bet = s.next_bet(session.spins.clone(), session.bets.clone());
-        println!("Placing bet: {:?}", bet);
-        session.bets.push(bet);
-        session.amount -= bet.amount;
+        let bets = s.next_bet(session.spins.clone(), session.bets.clone());
+        session.bets.push(bets.clone());
 
         let spin = RouletteSpin::spin();
         session.spins.push(spin);
         println!("Spin turned up {}", spin);
 
-        let pay_out = bet.pays(&spin);
-        session.amount += pay_out;
-        println!("Pay out: {}", pay_out);
+        for bet in bets {
+            println!("Placing bet: {:?}", bet);
+            session.amount -= bet.amount;
+
+            let pay_out = bet.pays(&spin);
+            session.amount += pay_out;
+            println!("Pay out: {}", pay_out);
+        }
+
+
 
         if session.amount <= 0 {
             println!("You lost it all!");

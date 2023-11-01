@@ -34,7 +34,7 @@ fn single_bet_pays() {
     };
     let spin = RouletteSpin::Number(35);
 
-    assert_eq!(bet.pays(&spin), 35 * bet.amount);
+    assert_eq!(bet.pays(&spin), 35 * bet.amount + bet.amount);
 }
 
 #[test]
@@ -48,7 +48,7 @@ fn street_bet_pays() {
     assert_eq!(bet.pays(&spin), 0);
 
     let spin = RouletteSpin::Number(7);
-    assert_eq!(bet.pays(&spin), 11 * bet.amount);
+    assert_eq!(bet.pays(&spin), 11 * bet.amount + bet.amount);
 
     let spin = RouletteSpin::Number(4);
     assert_eq!(bet.pays(&spin), 0);
@@ -58,7 +58,7 @@ fn street_bet_pays() {
         bet_type: BetType::Street(11),
     };
     let spin = RouletteSpin::Number(34);
-    assert_eq!(bet.pays(&spin), 11 * bet.amount);
+    assert_eq!(bet.pays(&spin), 11 * bet.amount + bet.amount);
 
     let spin = RouletteSpin::Number(33);
     assert_eq!(bet.pays(&spin), 0);
@@ -128,7 +128,7 @@ fn black_bet_pays() {
         assert_eq!(bet.pays(&spin), 0);
 
         let spin = RouletteSpin::Number(2);
-        assert_eq!(bet.pays(&spin), bet.amount);
+        assert_eq!(bet.pays(&spin), bet.amount + bet.amount);
     }
 }
 
@@ -160,43 +160,42 @@ fn test_a_round() {
 
 #[test]
 fn dozen_bet_pays() {
-  let bet = Bet {
-    amount: 1,
-    bet_type: BetType::Dozen(1), 
-  };
+    let bet = Bet {
+        amount: 1,
+        bet_type: BetType::Dozen(1),
+    };
 
-  let spin = RouletteSpin::Number(1);
-  assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
+    let spin = RouletteSpin::Number(1);
+    assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
 
-  let spin = RouletteSpin::Number(12);
-  assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
+    let spin = RouletteSpin::Number(12);
+    assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
 
-  let spin = RouletteSpin::Number(24); 
-  assert_eq!(bet.pays(&spin), 0);
+    let spin = RouletteSpin::Number(24);
+    assert_eq!(bet.pays(&spin), 0);
 
-  let bet = Bet {
-    amount: 1, 
-    bet_type: BetType::Dozen(2),
-  };
+    let bet = Bet {
+        amount: 1,
+        bet_type: BetType::Dozen(2),
+    };
 
-  let spin = RouletteSpin::Number(13);
-  assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
+    let spin = RouletteSpin::Number(13);
+    assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
 
-  let bet = Bet {
+    let bet = Bet {
         amount: 1,
         bet_type: BetType::Dozen(3),
-        };
-        let spin = RouletteSpin::Number(23);
-        assert_eq!(bet.pays(&spin), 0);
+    };
+    let spin = RouletteSpin::Number(23);
+    assert_eq!(bet.pays(&spin), 0);
 
-        let    spin = RouletteSpin::Number(36);
-        assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
-        
+    let spin = RouletteSpin::Number(36);
+    assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
 
     let bet = Bet {
         amount: 1,
         bet_type: BetType::Dozen(4),
-        };
-        let spin = RouletteSpin::Number(24);
-        assert_eq!(bet.pays(&spin), 0);
+    };
+    let spin = RouletteSpin::Number(24);
+    assert_eq!(bet.pays(&spin), 0);
 }

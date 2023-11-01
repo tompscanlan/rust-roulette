@@ -35,7 +35,7 @@ impl Bet {
         match self.bet_type {
             BetType::Single(n) => {
                 if *spin == RouletteSpin::Number(n) {
-                    35 * self.amount
+                    35 * self.amount + self.amount
                 } else {
                     0
                 }
@@ -49,7 +49,7 @@ impl Bet {
                     RouletteSpin::Number(n) => {
                         // dbg!(n, street * 3 + 1, street * 3 + 3);
                         if n > &(street * 3) && n <= &(street * 3 + 3) {
-                            11 * self.amount
+                            11 * self.amount + self.amount
                         } else {
                             0
                         }
@@ -70,7 +70,7 @@ impl Bet {
             BetType::Black => match spin {
                 RouletteSpin::Number(n) => {
                     if RouletteSpin::color(n) == "Black" {
-                        self.amount
+                        self.amount + self.amount
                     } else {
                         0
                     }
@@ -81,7 +81,7 @@ impl Bet {
             BetType::Even => match spin {
                 RouletteSpin::Number(n) => {
                     if n % 2 == 0 {
-                        self.amount
+                        self.amount + self.amount
                     } else {
                         0
                     }
@@ -91,7 +91,7 @@ impl Bet {
             BetType::Odd => match spin {
                 RouletteSpin::Number(n) => {
                     if n % 2 == 1 {
-                        self.amount
+                        self.amount + self.amount
                     } else {
                         0
                     }
