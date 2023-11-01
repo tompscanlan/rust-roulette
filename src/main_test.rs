@@ -157,3 +157,46 @@ fn test_a_round() {
         dbg!(bet.pays(&spin));
     }
 }
+
+#[test]
+fn dozen_bet_pays() {
+  let bet = Bet {
+    amount: 1,
+    bet_type: BetType::Dozen(1), 
+  };
+
+  let spin = RouletteSpin::Number(1);
+  assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
+
+  let spin = RouletteSpin::Number(12);
+  assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
+
+  let spin = RouletteSpin::Number(24); 
+  assert_eq!(bet.pays(&spin), 0);
+
+  let bet = Bet {
+    amount: 1, 
+    bet_type: BetType::Dozen(2),
+  };
+
+  let spin = RouletteSpin::Number(13);
+  assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
+
+  let bet = Bet {
+        amount: 1,
+        bet_type: BetType::Dozen(3),
+        };
+        let spin = RouletteSpin::Number(23);
+        assert_eq!(bet.pays(&spin), 0);
+
+        let    spin = RouletteSpin::Number(36);
+        assert_eq!(bet.pays(&spin), 2 * bet.amount + bet.amount);
+        
+
+    let bet = Bet {
+        amount: 1,
+        bet_type: BetType::Dozen(4),
+        };
+        let spin = RouletteSpin::Number(24);
+        assert_eq!(bet.pays(&spin), 0);
+}

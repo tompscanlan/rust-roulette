@@ -1,4 +1,6 @@
 pub mod doubleonloss;
+pub mod cross;
+
 use crate::{Bet, RouletteSpin};
 
 pub(crate) trait Strategy {

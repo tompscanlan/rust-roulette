@@ -23,11 +23,10 @@ pub enum BetType {
     Black,
     Even,
     Odd,
-    Dozen,
+    Dozen(i32),
     Column,
     Snake,
 }
-
 
 impl Bet {
     #[allow(dead_code)]
@@ -79,6 +78,36 @@ impl Bet {
                 _ => 0,
             },
 
+            BetType::Even => match spin {
+                RouletteSpin::Number(n) => {
+                    if n % 2 == 0 {
+                        self.amount
+                    } else {
+                        0
+                    }
+                }
+                _ => 0,
+            },
+            BetType::Odd => match spin {
+                RouletteSpin::Number(n) => {
+                    if n % 2 == 1 {
+                        self.amount
+                    } else {
+                        0
+                    }
+                }
+                _ => 0,
+            },
+            BetType::Dozen(d) => match spin {
+                RouletteSpin::Number(n) => {
+                    if *n <= 12 * d && *n > 12 * (d - 1) {
+                        self.amount * 2 + self.amount
+                    } else {
+                        0
+                    }
+                }
+                _ => 0,
+            },
             _ => {
                 print!("Not implemented");
                 0
