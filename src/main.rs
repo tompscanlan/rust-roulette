@@ -5,6 +5,7 @@ mod strategy;
 mod spin;
 use bet::{Bet, BetType};
 use spin::RouletteSpin;
+use strategy::cross::Cross;
 use strategy::doubleonloss::DoubleOnLoss;
 use strategy::Strategy;
 
@@ -22,7 +23,7 @@ fn main() {
         spins: vec![],
         start_amount: 100,
         amount: 100,
-        strategy: Box::new(DoubleOnLoss {}),
+        strategy: Box::new(Cross {}),
     };
 
     for _ in 0..100000 {
@@ -44,8 +45,6 @@ fn main() {
             session.amount += pay_out;
             println!("Pay out: {}", pay_out);
         }
-
-
 
         if session.amount <= 0 {
             println!("You lost it all!");
